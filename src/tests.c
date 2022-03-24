@@ -251,6 +251,19 @@ void test4() {
     }
   }
 
+  assert(set_save(myset, "test4.bin"));
+
+  Set myset2 = set_load("test4.bin");
+  assert(myset2 != NULL);
+
+  size_t origsize = set_get_size(myset);
+
+  for (size_t i = 0; i < origsize; ++i) {
+    assert_str_eq(set_get(myset, i), set_get(myset2, i));
+  }
+  assert(set_get_size(myset2) == origsize);
+  set_delete(myset2);
+
   for (size_t i = 0; i < SIZE + 100; ++i) {
     size_t idx = rand() % SIZE;
     if (already[idx])
@@ -348,9 +361,9 @@ void test7() {
     set_insert(myset1, string[i]);
   }
 
-  assert(set_save(myset1, "test.bin"));
-    
-  myset2 = set_load("test.bin");
+  assert(set_save(myset1, "test7.bin"));
+
+  myset2 = set_load("test7.bin");
   assert(myset2 != NULL);
 
   size_t origsize = set_get_size(myset1);
