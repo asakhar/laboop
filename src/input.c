@@ -1,12 +1,11 @@
 #include "input.h"
 
 #include <stdio.h>
-#define auto __auto_type
 
 size_t read_unumber(size_t from, size_t to, bool *exited) {
   while (1) {
     size_t choice;
-    auto res = scanf("%zu", &choice);
+    int res = scanf("%zu", &choice);
     size_t missed = 0;
     int c = 0;
     while ((c = getc(stdin)) != '\n') {
@@ -27,7 +26,7 @@ size_t read_unumber(size_t from, size_t to, bool *exited) {
 ssize_t read_inumber(ssize_t from, ssize_t to, bool *exited) {
   while (1) {
     ssize_t choice;
-    auto res = scanf("%ld", &choice);
+    int res = scanf("%ld", &choice);
     size_t missed = 0;
     int c = 0;
     while ((c = getc(stdin)) != '\n') {

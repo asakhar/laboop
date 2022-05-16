@@ -16,7 +16,7 @@ void test6();
 void test7();
 
 int main(int argc, char const *argv[]) {
-  auto file = fopen("/dev/random", "r");
+  FILE *file = fopen("/dev/random", "r");
   int seed;
   fread(&seed, sizeof(int), 1, file);
   fclose(file);
@@ -83,6 +83,17 @@ void array_remove(char const *needle, char const **haystack, size_t size) {
   memcpy(haystack + idx, haystack + idx + 1, (size - idx - 1) * sizeof(void *));
 }
 
+struct Node {
+  char *data;
+  struct Node *child[2];
+  struct Node *parent;
+  size_t child_nodes;
+};
+
+struct Set {
+  struct Node *root;
+};
+
 size_t get_sub_tree_size(struct Node *node) {
   if (node == NULL)
     return 0;
@@ -95,7 +106,7 @@ size_t get_sub_tree_size(struct Node *node) {
 }
 
 void test1() {
-  auto myset = set();
+  Set myset = set();
 
   assert(set_insert(myset, "abc") == true);
   checkset(myset, 1);
@@ -132,7 +143,7 @@ void test1() {
 }
 
 void test2() {
-  auto myset = set();
+  Set myset = set();
 
   char const *string[] = {"b", "a", "c", "F", "D", "E"};
 
@@ -166,7 +177,7 @@ void test2() {
 }
 
 void test3() {
-  auto myset = set();
+  Set myset = set();
 
   char const *string[] = {"b", "a", "c", "F", "D", "E"};
 
@@ -222,9 +233,9 @@ void test3() {
 }
 
 void test4() {
-  auto myset = set();
-
-  const size_t SIZE = 300;
+  Set myset = set();
+  // size_t const SIZE = 300; // for some reason do not work in msvc
+#define SIZE 300
   char *strings[SIZE];
   bool already[SIZE];
   bool already_rem[SIZE];
@@ -242,10 +253,10 @@ void test4() {
   memcpy(sorted, strings, SIZE * sizeof(char const *));
   size_t const sorted_size = sort_and_unify(sorted, SIZE);
   {
-    auto iter = set_iter(myset);
+    iterator iter = set_iter(myset);
     for (size_t i = 0; i < SIZE - already_amount; ++i) {
-      auto res = set_get(myset, i);
-      auto item = iter_next(&iter);
+      char const *res = set_get(myset, i);
+      char const *item = iter_next(&iter);
       assert_str_eq(sorted[i], item);
       assert_str_eq(sorted[i], res);
     }
@@ -273,10 +284,10 @@ void test4() {
     already_amount += !already_rem[idx];
     checkset(myset, SIZE - already_amount);
     {
-      auto iter = set_iter(myset);
+      iterator iter = set_iter(myset);
       for (size_t j = 0; j < SIZE - already_amount; ++j) {
-        auto res = set_get(myset, j);
-        auto item = iter_next(&iter);
+        char const *res = set_get(myset, j);
+        char const *item = iter_next(&iter);
         assert_str_eq(sorted[j], item);
         assert_str_eq(sorted[j], res);
       }
@@ -287,11 +298,12 @@ void test4() {
   for (size_t i = 0; i < SIZE; ++i)
     free(strings[i]);
   set_delete(myset);
+#undef SIZE
 }
 
 void test5() {
-  auto myset1 = set();
-  auto myset2 = set();
+  Set myset1 = set();
+  Set myset2 = set();
 
   char const *string[] = {"b", "a", "c", "F", "D", "E", "G"};
 
@@ -303,7 +315,7 @@ void test5() {
   set_insert(myset2, string[4]);
   set_insert(myset2, string[6]);
 
-  auto unionres = set_union(myset1, myset2);
+  Set unionres = set_union(myset1, myset2);
 
   assert_str_eq(set_get(unionres, 0), string[4]);
   assert_str_eq(set_get(unionres, 1), string[5]);
@@ -320,8 +332,8 @@ void test5() {
 }
 
 void test6() {
-  auto myset1 = set();
-  auto myset2 = set();
+  Set myset1 = set();
+  Set myset2 = set();
 
   char const *string[] = {"b", "a", "c", "F", "D", "a", "G"};
 
@@ -333,7 +345,7 @@ void test6() {
   set_insert(myset2, string[4]);
   set_insert(myset2, string[6]);
 
-  auto unionres = set_union(myset1, myset2);
+  Set unionres = set_union(myset1, myset2);
 
   assert_str_eq(set_get(unionres, 0), string[4]);
   assert_str_eq(set_get(unionres, 1), string[3]);
@@ -349,13 +361,14 @@ void test6() {
 }
 
 void test7() {
-  auto myset1 = set();
+  Set myset1 = set();
   Set myset2;
 
   char const *string[] = {"b", "a", "c", "F", "D", "a",
                           "G", "#", "f", "n", "b", "A"};
-
-  size_t const SIZE = sizeof(string) / sizeof(string[0]);
+  // size_t const SIZE = sizeof(string) / sizeof(string[0]); // msvc "const is
+  // // not actually a constant" stuff
+#define SIZE sizeof(string) / sizeof(string[0])
 
   for (size_t i = 0; i < SIZE; ++i) {
     set_insert(myset1, string[i]);
@@ -375,4 +388,5 @@ void test7() {
 
   set_delete(myset1);
   set_delete(myset2);
+#undef SIZE
 }

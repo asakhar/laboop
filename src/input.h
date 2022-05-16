@@ -5,6 +5,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+typedef unsigned long size_t;
+typedef long ssize_t;
+
 #define green "\033[0;32m"
 #define red "\033[0;31m"
 #define reset "\033[0m"

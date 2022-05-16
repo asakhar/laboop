@@ -64,23 +64,23 @@ int main(int argc, char const *argv[]) {
 
 void add_element(Set sets[], size_t *current) {
   printf("Input element to insert:\n> ");
-  auto line = read_line();
+  char* line = read_line();
   puts(set_insert(sets[*current], line) ? green "Successfully inserted!\n" reset
                                         : red "Failed to insert!\n" reset);
   free(line);
 }
 void remove_element(Set sets[], size_t *current) {
   printf("Input element to remove:\n> ");
-  auto line = read_line();
+  char* line = read_line();
   puts(set_remove(sets[*current], line) ? green "Successfully removed!\n" reset
                                         : red "Failed to remove!\n" reset);
   free(line);
 }
 void erase_element(Set sets[], size_t *current) {
-  auto set_size = set_get_size(sets[*current]);
+  size_t set_size = set_get_size(sets[*current]);
   printf("Input element index to remove [0; %zu):\n> ", set_size);
   bool exited = false;
-  auto idx = read_unumber(0, set_size - 1, &exited);
+  size_t idx = read_unumber(0, set_size - 1, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
@@ -93,15 +93,15 @@ void clear_set(Set sets[], size_t *current) {
   puts(green "Successfully cleared set!\n" reset);
 }
 void get_element(Set sets[], size_t *current) {
-  auto set_size = set_get_size(sets[*current]);
+  size_t set_size = set_get_size(sets[*current]);
   printf("Input element index to get it's value [0; %zu):\n> ", set_size);
   bool exited = false;
-  auto idx = read_unumber(0, set_size - 1, &exited);
+  size_t idx = read_unumber(0, set_size - 1, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
   }
-  auto res = set_get(sets[*current], idx);
+  char const* res = set_get(sets[*current], idx);
   if (res == NULL) {
     puts(red "Failed to get element!\n" reset);
     return;
@@ -110,8 +110,8 @@ void get_element(Set sets[], size_t *current) {
 }
 void index_of_element(Set sets[], size_t *current) {
   printf("Input element to get it's index:\n> ");
-  auto line = read_line();
-  auto idx = set_index_of(sets[*current], line);
+  char* line = read_line();
+  ssize_t idx = set_index_of(sets[*current], line);
   if (idx == -1) {
     puts(red "Failed to get elements index!\n" reset);
     free(line);
@@ -132,7 +132,7 @@ void print_set(Set sets[], size_t *current) {
 void union_sets(Set sets[], size_t *current) {
   printf("Input set's index to union with [0; %zu):\n> ", NSETS);
   bool exited = false;
-  auto idx2 = read_unumber(0, NSETS, &exited);
+  size_t idx2 = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
@@ -141,12 +141,12 @@ void union_sets(Set sets[], size_t *current) {
          "be lost) [0; %zu):\n> ",
          NSETS);
   exited = false;
-  auto idxres = read_unumber(0, NSETS, &exited);
+  size_t idxres = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
   }
-  auto res = set_union(sets[*current], sets[idx2]);
+  Set res = set_union(sets[*current], sets[idx2]);
   set_delete(sets[idxres]);
   sets[idxres] = res;
   puts(green "Unioned successfully!\n" reset);
@@ -154,7 +154,7 @@ void union_sets(Set sets[], size_t *current) {
 void intersect_sets(Set sets[], size_t *current) {
   printf("Input set's index to intersect with [0; %zu):\n> ", NSETS);
   bool exited = false;
-  auto idx2 = read_unumber(0, NSETS, &exited);
+  size_t idx2 = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
@@ -163,12 +163,12 @@ void intersect_sets(Set sets[], size_t *current) {
          "be lost) [0; %zu):\n> ",
          NSETS);
   exited = false;
-  auto idxres = read_unumber(0, NSETS, &exited);
+  size_t idxres = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
   }
-  auto res = set_intersect(sets[*current], sets[idx2]);
+  Set res = set_intersect(sets[*current], sets[idx2]);
   set_delete(sets[idxres]);
   sets[idxres] = res;
   puts(green "Intersected successfully!\n" reset);
@@ -176,7 +176,7 @@ void intersect_sets(Set sets[], size_t *current) {
 void subtract_set(Set sets[], size_t *current) {
   printf("Input set's index to subtract with [0; %zu):\n> ", NSETS);
   bool exited = false;
-  auto idx2 = read_unumber(0, NSETS, &exited);
+  size_t idx2 = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
@@ -185,12 +185,12 @@ void subtract_set(Set sets[], size_t *current) {
          "be lost) [0; %zu):\n> ",
          NSETS);
   exited = false;
-  auto idxres = read_unumber(0, NSETS, &exited);
+  size_t idxres = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
   }
-  auto res = set_difference(sets[*current], sets[idx2]);
+  Set res = set_difference(sets[*current], sets[idx2]);
   set_delete(sets[idxres]);
   sets[idxres] = res;
   puts(green "Subtracted successfully!\n" reset);
@@ -198,7 +198,7 @@ void subtract_set(Set sets[], size_t *current) {
 void change_current(Set sets[], size_t *current) {
   printf("Input set's index to select [0; %zu):\n> ", NSETS);
   bool exited = false;
-  auto idx2 = read_unumber(0, NSETS, &exited);
+  size_t idx2 = read_unumber(0, NSETS, &exited);
   if (exited) {
     puts(yellow "Operation cancelled!\n" reset);
     return;
@@ -213,8 +213,8 @@ void change_current(Set sets[], size_t *current) {
 
 void save_set(Set sets[], size_t *current) {
   printf("Input file name to save in:\n> ");
-  auto line = read_line();
-  auto res = set_save(sets[*current], line);
+  char* line = read_line();
+  bool res = set_save(sets[*current], line);
   if (!res) {
     puts(red "Failed to save set!\n" reset);
     free(line);
@@ -226,8 +226,8 @@ void save_set(Set sets[], size_t *current) {
 }
 void load_set(Set sets[], size_t *current) { 
   printf("Input file name to load from:\n> ");
-  auto line = read_line();
-  auto res = set_load(line);
+  char* line = read_line();
+  Set res = set_load(line);
   if (!res) {
     puts(red "Failed to load set!\n" reset);
     free(line);

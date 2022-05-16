@@ -6,9 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Node Node;
+typedef struct Node {
+  char* data;
+  struct Node* child[2];
+  struct Node* parent;
+  size_t child_nodes;
+} Node;
+
+typedef struct Set {
+  struct Node* root;
+}* Set;
+
 typedef Node *lpnode;
-typedef Set lpset;
 typedef char const *lpstr;
 
 static void free_node(lpnode node) {
@@ -155,7 +164,7 @@ static lpnode node_get(lpnode node, size_t idx) {
 }
 
 static inline lpstr node_str_get(lpnode node, size_t idx) {
-  auto res = node_get(node, idx);
+  lpnode res = node_get(node, idx);
   if (res == NULL)
     return NULL;
   return res->data;
@@ -196,12 +205,12 @@ lpnode node_load(lpnode parent, FILE *file) {
   return node;
 }
 
-lpset set() { return calloc(sizeof(struct Set), 1); }
-void set_delete(lpset set) {
+Set set() { return calloc(sizeof(struct Set), 1); }
+void set_delete(Set set) {
   set_clear(set);
   free(set);
 }
-bool set_insert(lpset set, lpstr value) {
+bool set_insert(Set set, lpstr value) {
   if (value == NULL) {
     return false;
   }
@@ -210,14 +219,14 @@ bool set_insert(lpset set, lpstr value) {
   }
   return node_insert(set->root, value);
 }
-bool set_remove(lpset set, lpstr value) {
+bool set_remove(Set set, lpstr value) {
   if (set->root == NULL) {
     return false;
   }
   return node_remove(&set->root, value);
 }
-bool set_erase(lpset set, size_t idx) {
-  auto res = node_get(set->root, idx);
+bool set_erase(Set set, size_t idx) {
+  lpnode res = node_get(set->root, idx);
   if (res == NULL)
     return false;
   if (res->parent) {
@@ -228,11 +237,11 @@ bool set_erase(lpset set, size_t idx) {
   set->root = NULL;
   return true;
 }
-void set_clear(lpset set) {
+void set_clear(Set set) {
   free_node(set->root);
   set->root = NULL;
 }
-lpstr set_get(lpset set, size_t idx) {
+lpstr set_get(Set set, size_t idx) {
   assert(set != NULL);
   return node_str_get(set->root, idx);
 }
@@ -272,7 +281,7 @@ iterator set_find(Set set, lpstr value) {
 }
 
 ssize_t set_index_of(Set set, lpstr value) {
-  auto res = set_find(set, value);
+  iterator res = set_find(set, value);
   if (res.it == NULL) {
     return -1;
   }
@@ -293,7 +302,7 @@ Set set_union(Set set1, Set set2) {
   ssize_t size = set_get_size(set2);
   for (ssize_t i = 0; i < size; ++i) {
     size_t idx = (((~i & 1) << 1) - 1) * (i + 1) / 2 + size / 2;
-    auto item = set_get(set2, idx);
+    char const* item = set_get(set2, idx);
     if (!set_contains(newset, item)) {
       set_insert(newset, item);
     }
@@ -311,7 +320,7 @@ Set set_intersect(Set set1, Set set2) {
   ssize_t size = set_get_size(sets[second]);
   for (ssize_t i = 0; i < size; ++i) {
     size_t idx = (((~i & 1) << 1) - 1) * (i + 1) / 2 + size / 2;
-    auto item = set_get(sets[second], idx);
+    char const* item = set_get(sets[second], idx);
     if (set_contains(sets[!second], item))
       set_insert(newset, item);
   }
@@ -322,7 +331,7 @@ Set set_difference(Set set1, Set set2) {
   ssize_t size = set_get_size(set1);
   for (ssize_t i = 0; i < size; ++i) {
     size_t idx = (((~i & 1) << 1) - 1) * (i + 1) / 2 + size / 2;
-    auto item = set_get(set1, idx);
+    char const* item = set_get(set1, idx);
     if (!set_contains(set2, item)) {
       set_insert(newset, item);
     }
@@ -331,7 +340,7 @@ Set set_difference(Set set1, Set set2) {
 }
 
 bool set_save(Set set, char const *filename) {
-  auto file = fopen(filename, "wb");
+  FILE* file = fopen(filename, "wb");
   if (file == NULL) {
     perror("Set not saved");
     return false;
@@ -341,7 +350,7 @@ bool set_save(Set set, char const *filename) {
   return true;
 }
 Set set_load(char const *filename) {
-  auto file = fopen(filename, "rb");
+  FILE* file = fopen(filename, "rb");
   if (file == NULL) {
     perror("Set not loaded");
     return NULL;
