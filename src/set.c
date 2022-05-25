@@ -13,7 +13,7 @@ typedef struct Node {
   size_t child_nodes;
 } Node;
 
-typedef struct Set {
+typedef struct SetStruct {
   struct Node* root;
 }* Set;
 
@@ -205,7 +205,7 @@ lpnode node_load(lpnode parent, FILE *file) {
   return node;
 }
 
-Set set() { return calloc(sizeof(struct Set), 1); }
+Set set() { return calloc(sizeof(struct SetStruct), 1); }
 void set_delete(Set set) {
   set_clear(set);
   free(set);

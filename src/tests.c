@@ -90,7 +90,7 @@ struct Node {
   size_t child_nodes;
 };
 
-struct Set {
+struct SetStruct {
   struct Node *root;
 };
 

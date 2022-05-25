@@ -8,7 +8,7 @@ typedef long ssize_t;
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct Set * Set;
+typedef struct SetStruct * Set;
 
 typedef struct iterator {
   struct Node* it;
